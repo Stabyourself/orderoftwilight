@@ -11,34 +11,34 @@ function player:init(x, y)
 	self.active = true
 	self.gravity = yacceleration
 	self.inair = true
-	
+
 	self.category = 3
-	
+
 	self.offsets = {4.5, 4.5}
 	self.centers = {12.5, 14.5}
 	self.dir = "right"
-	
+
 	self.animstate = "idle"
 	self.walkframe = 1
 	self.walkframetimer = 0
-	
+
 	self.hornglowtimer = 0
-	
+
 	self.rotation = 0
 	self.gravitydirection = math.pi*.5
 	self.magicframe = 0
 	self.ascendtimer = 0
-	
+
 	self.controlsenabled = true
-	
+
 	self.mask = {}
 end
 
 function player:update(dt)
 	self:movement(dt)
-	
+
 	self.hornglowtimer = math.mod(self.hornglowtimer+dt*5, 1)
-	
+
 	self.walkframetimer = self.walkframetimer + dt*10
 	while self.walkframetimer > playerwalkdelay do
 		self.walkframetimer = self.walkframetimer - playerwalkdelay
@@ -47,7 +47,7 @@ function player:update(dt)
 			self.walkframe = 1
 		end
 	end
-	
+
 	if not self.dead and self.x >= mapwidth then
 		self.dead = true
 		self.gravitydirection = math.pi*.5
@@ -64,7 +64,7 @@ function player:update(dt)
 			self.dead = true
 		end
 	end
-	
+
 	if self.ascendtimer > 0 then
 		self.ascendtimer = self.ascendtimer - dt
 		if self.ascendtimer <= 0 then
@@ -72,23 +72,23 @@ function player:update(dt)
 			self.ascendtimer = 0
 		end
 	end
-	
+
 	if self.ascendtimer > 0.1 then
 		self.speedy = - ascendspeed
 	end
-end	
+end
 
 function player:movement(dt)
 	local accel = playeraccel
 	if self.inair then
 		accel = playerairaccel
 	end
-	
+
 	local friction = friction
 	if self.inair then
 		friction = airfriction
 	end
-	
+
 	if not self.dead and (rightkey() or self.x > mapwidth-2) then
 		if self.x > mapwidth-2 then
 			if self.gravitydirection == math.pi*1.5 then
@@ -133,19 +133,19 @@ function player:movement(dt)
 			end
 		end
 	end
-	
+
 	if self.speedx > maxplayerspeed then
 		self.speedx = maxplayerspeed
 	elseif self.speedx < -maxplayerspeed then
 		self.speedx = -maxplayerspeed
 	end
-	
+
 	if self.jumping then
 		if self.speedy >= 0 then
 			self:stopjump()
 		end
 	end
-	
+
 	if self.magicframe > 0 then
 		self.magictimer = self.magictimer + dt
 		while self.magictimer > magicframedelay do
@@ -156,7 +156,7 @@ function player:movement(dt)
 			end
 		end
 	end
-	
+
 	if self.invisible then
 		self.invisibletimer = self.invisibletimer - dt
 		if self.invisibletimer <= 0 then
@@ -172,11 +172,11 @@ function player:draw()
 	if self.dir == "left" then
 		xscale = -xscale
 	end
-	
+
 	hornoffset = {x=0, y=0}
-	
+
 	local graphic = playeranimation.idle
-	
+
 	if self.dead then
 		graphic = playeranimation.dead
 		invisgraphic = playeranimation.dead
@@ -194,11 +194,11 @@ function player:draw()
 		invisgraphic = playeranimationinvis.walk[self.walkframe]
 		hornoffset.y = hornoffsets.walk[self.walkframe][2]
 	end
-	
+
 	if self.invisible then
 		love.graphics.draw(invisgraphic, math.floor(((self.x-xscroll)*tilewidth+self.offsets[1])*scale), math.floor(((self.y-yscroll)*tilewidth+self.offsets[2])*scale), self.rotation, xscale, scale, self.centers[1], self.centers[2])
 	end
-	
+
 	if not self.dead then
 		local hornglow
 		if self.hornglowtimer <= 0.5 then
@@ -206,37 +206,37 @@ function player:draw()
 		else
 			hornglow = 1-(self.hornglowtimer-.5)
 		end
-		
+
 		if spelltimeouttimer > spelltimeout - .5 then
 			local a = (spelltimeout - spelltimeouttimer)/.5
-			love.graphics.setColor(255, 255, 255, 255*a)
+			love.graphics.setColor(1, 1, 1, a)
 			hornglow = hornglow * a
 		end
-		
-		love.graphics.setColor(180, 72, 215, math.min(255, 127*(#currentspell/maxrunecount*2))*hornglow)
+
+		love.graphics.setColor(0.71, 0.28, 0.84, math.min(1, 0.5*(#currentspell/maxrunecount*2))*hornglow)
 		love.graphics.draw(hornglowimg, math.floor(((self.x-xscroll)*tilewidth+self.offsets[1]+hornoffset.x)*scale), math.floor(((self.y-yscroll)*tilewidth+self.offsets[2]+hornoffset.y)*scale), self.rotation, xscale, scale, self.centers[1], self.centers[2])
-		
+
 		if #currentspell > 4 then
-			love.graphics.setColor(180, 72, 215, math.min(255, 127*((#currentspell-4)/maxrunecount*2))*hornglow)
+			love.graphics.setColor(0.71, 0.28, 0.84, math.min(1, 0.5*((#currentspell-4)/maxrunecount*2))*hornglow)
 			love.graphics.draw(hornglowbigimg, math.floor(((self.x-xscroll)*tilewidth+self.offsets[1]+hornoffset.x)*scale), math.floor(((self.y-yscroll)*tilewidth+self.offsets[2]+hornoffset.y)*scale), self.rotation, xscale, scale, self.centers[1], self.centers[2])
 		end
 	end
-	
+
 	local a = 1
 	if self.invisible then
 		a = (1-self.invisibletimer/invisibletime)
 	end
-	
+
 	if not gamewon then
-		love.graphics.setColor(255, 255, 255, 255*a)
+		love.graphics.setColor(1, 1, 1, a)
 		love.graphics.draw(graphic, math.floor(((self.x-xscroll)*tilewidth+self.offsets[1])*scale), math.floor(((self.y-yscroll)*tilewidth+self.offsets[2])*scale), self.rotation, xscale, scale, self.centers[1], self.centers[2])
 	end
-	
-	love.graphics.setColor(255, 255, 255, 255)
-	
+
+	love.graphics.setColor(1, 1, 1)
+
 	if not self.dead and self.magicframe > 0 then
 		local x, y = self:getpos(1, -1.333)
-		love.graphics.drawq(magicimg, magicquad[self.magicframe], math.floor((x-xscroll)*tilewidth*scale), math.floor((y-yscroll)*tilewidth*scale), 0, scale, scale, 5, 5)
+		love.graphics.draw(magicimg, magicquad[self.magicframe], math.floor((x-xscroll)*tilewidth*scale), math.floor((y-yscroll)*tilewidth*scale), 0, scale, scale, 5, 5)
 	end
 end
 
@@ -263,7 +263,7 @@ function player:ceilcollide(a, b, c, d)
 	if self:globalcollide(a, b, c, d, "ceil") then
 		return false
 	end
-	
+
 	if self.dead then
 		return false
 	end
@@ -273,7 +273,7 @@ function player:floorcollide(a, b, c, d)
 	if self:globalcollide(a, b, c, d, "floor") then
 		return false
 	end
-	
+
 	self.inair = false
 	self.jumping = false
 end
@@ -303,7 +303,7 @@ function player:globalcollide(a, b, c, d, dir)
 		newrunetimer = newrunetime
 		return true
 	end
-	
+
 	if not self.dead and a == "tile" then
 		local dir = dir
 		if dir == "ceil" then
@@ -311,15 +311,15 @@ function player:globalcollide(a, b, c, d, dir)
 		elseif dir == "floor" then
 			dir = "down"
 		end
-		
+
 		local dir = adjustcollside(dir, self.gravitydirection)
-		
+
 		if dir == "up" then
 			dir = "ceil"
 		elseif dir == "down" then
 			dir = "floor"
 		end
-		
+
 		if tilequads[map[b.cox][b.coy][1]][dir .. "spike"] then
 			self:die()
 		end
@@ -370,7 +370,7 @@ function player:getpos(xoffset, yoffset)
 			x = self.x+self.width/2-xoffset
 			y = self.y+self.height/2-yoffset
 		end
-		
+
 	elseif self.gravitydirection == math.pi then
 		if self.dir == "left" then
 			dir = "up"
@@ -381,7 +381,7 @@ function player:getpos(xoffset, yoffset)
 			x = self.x+self.width/2-yoffset
 			y = self.y+self.height/2+xoffset
 		end
-		
+
 	elseif self.gravitydirection == 0 then
 		if self.dir == "right" then
 			dir = "up"
@@ -393,7 +393,7 @@ function player:getpos(xoffset, yoffset)
 			y = self.y+self.height/2+xoffset
 		end
 	end
-	
+
 	return x, y, dir
 end
 
@@ -443,7 +443,7 @@ end
 function player:cubespawn()
 	local x, y = self:getpos(2, -2.333)
 	table.insert(objects.cube, cube:new(x, y))
-	
+
 	if #objects.cube > 3 and objects.cube[4].active then
 		table.remove(objects.cube, 1)
 	end
@@ -451,12 +451,12 @@ end
 
 function player:teleport()
 	local targetx, targety
-	
+
 	local failx, faily, failwidth, failheight
-	
+
 	for i = 1, 3 do
 		targetx, targety = self:getpos(teleportdistance, -i+1/4)
-		
+
 		local col = checkrect(targetx-self.width/2, targety, self.width, self.height, "all", true)
 		if #col == 0 and targetx-self.width/2+self.width > 0 and targety < mapheight and targety+self.height > 0 then
 			self.x, self.y = targetx-self.width/2, targety
@@ -490,7 +490,7 @@ end
 function player:shockwave()
 	playsound(shockwavesound)
 	local x, y, dir = self:getpos(0, -1/3)
-	
+
 	table.insert(objects.shockwave, shockwave:new(x, y, dir))
 	if dir == "right" then
 		table.insert(objects.shockwave, shockwave:new(x, y, "left"))

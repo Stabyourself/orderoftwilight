@@ -9,11 +9,11 @@ function shockwave:init(x, y, dir)
 	self.active = true
 	self.static = false
 	self.gravity = 0
-	self.rotation = 0	
+	self.rotation = 0
 	self.category = 7
-	
+
 	self.mask = {true, true, true, true, false, false, true}
-	
+
 	if self.dir == "left" then
 		self.height = 2
 		self.speedx = -shockwavespeed
@@ -29,12 +29,12 @@ function shockwave:init(x, y, dir)
 		self.speedy = shockwavespeed
 		self.rotation = math.pi/2
 	end
-	
+
 	self.x = x-self.width/2
 	self.y = y-self.height/2
-	
+
 	self.timer = 0
-	
+
 	self.hittable = {}
 end
 
@@ -48,9 +48,9 @@ function shockwave:draw()
 	if self.dir == "left" or self.dir == "up" then
 		xscale = -xscale
 	end
-	love.graphics.setColor(255, 255, 255, 255*(1-self.timer/shockwavetime))
+	love.graphics.setColor(1, 1, 1, 1-self.timer/shockwavetime)
 	love.graphics.draw(shockwaveimg, math.floor(((self.x-xscroll+self.width/2)*tilewidth)*scale), math.floor(((self.y-yscroll+self.height/2)*tilewidth)*scale), self.rotation, xscale, scale, 4, 6)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 end
 
 function shockwave:globalcollide(a, b, c, d, dir)

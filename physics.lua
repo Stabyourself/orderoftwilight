@@ -1,32 +1,32 @@
 --[[
 	PHYSICS LIBRARY THING
-	WRITTEN BY MAURICE GUÉGAN FOR MARI0
+	WRITTEN BY MAURICE GUÃ‰GAN FOR MARI0
 	DON'T STEAL MY SHIT
 ]]--
 
 function physicsupdate(dt)
 	local lobjects = objects
-	
+
 	for j, w in pairs(lobjects) do
-		if j ~= "tile" and (not timefrozen or j == "player") then			
+		if j ~= "tile" and (not timefrozen or j == "player") then
 			for i, v in pairs(w) do
 				if v.static == false and v.active then
 					--GRAVITY
 					v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-					
+
 					if v.speedy > maxyspeed then
 						v.speedy = maxyspeed
 					end
-					
+
 					--Standard conversion!
 					if v.gravitydirection and v.gravitydirection ~= math.pi/2 then
 						v.speedx, v.speedy = convertfromstandard(v, v.speedx, v.speedy)
 					end
-					
+
 					--COLLISIONS ROFL
 					local horcollision = false
 					local vercollision = false
-					
+
 					--VS OTHER OBJECTS --but not: portalwall, castlefirefire
 					for h, u in pairs(lobjects) do
 						local hor, ver = handlegroup(i, h, u, v, j, dt, passed)
@@ -37,20 +37,20 @@ function physicsupdate(dt)
 							vercollision = true
 						end
 					end
-					
+
 					--VS TILES (Because I only wanna check close ones)
 					local xstart = math.floor(v.x+v.speedx*dt-2/16)+1
 					local ystart = math.floor(v.y+v.speedy*dt-2/16)+1
-					
+
 					local xfrom = xstart
 					local xto = xstart+math.ceil(v.width)
 					local dir = 1
-					
+
 					if v.speedx < 0 then
 						xfrom, xto = xto, xfrom
 						dir = -1
 					end
-					
+
 					for x = xfrom, xto, dir do
 						for y = ystart, ystart+math.ceil(v.height) do
 							--check if invisible block
@@ -70,20 +70,20 @@ function physicsupdate(dt)
 							end
 						end
 					end
-					
+
 					--Move the object
 					if vercollision == false then
 						v.y = v.y + v.speedy*dt
 					end
-					
+
 					if horcollision == false then
 						v.x = v.x + v.speedx*dt
 					end
-					
+
 					if v.gravitydirection and v.gravitydirection ~= math.pi/2 then
 						v.speedx, v.speedy = converttostandard(v, v.speedx, v.speedy)
 					end
-					
+
 					if v.gravity then
 						if math.abs(v.speedy-v.gravity*dt)<0.00001 and v.speedy ~= 0 and v.startfall then
 							v:startfall(i)
@@ -113,33 +113,33 @@ function handlegroup(i, h, u, v, j, dt, passed)
 			end
 		end
 	end
-	
+
 	return horcollision, vercollision
 end
 
 function checkcollision(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table | h: b2type | g: b2id | j: b1type | i: b1id
 	local hadhorcollision = false
 	local hadvercollision = false
-	
+
 	if math.abs(v.x-t.x) < math.max(v.width, t.width)+1 and math.abs(v.y-t.y) < math.max(v.height, t.height)+1 then
 		--check if it's a passive collision (Object is colliding anyway)
 		if not passed and aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height) then --passive collision! (oh noes!)
 			if passivecollision(v, t, h, g, j, i, dt) then
 				hadvercollision = true
 			end
-			
+
 		elseif aabb(v.x + v.speedx*dt, v.y + v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then
 			if aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, t.y, t.width, t.height) then --Collision is horizontal!
 				if horcollision(v, t, h, g, j, i, dt) then
 					hadhorcollision = true
 				end
-				
+
 			elseif aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then --Collision is vertical!
 				if vercollision(v, t, h, g, j, i, dt) then
 					hadvercollision = true
 				end
-				
-			else 
+
+			else
 				--We're fucked, it's a diagonal collision! run!
 				--Okay actually let's take this slow okay. Let's just see if we're moving faster horizontally than vertically, aight?
 				local grav = yacceleration
@@ -151,7 +151,7 @@ function checkcollision(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table 
 					if vercollision(v, t, h, g, j, i, dt) then
 						hadvercollision = true
 					end
-				else 
+				else
 					--okay so we're moving mainly vertically, so let's just pretend it was a horizontal collision? aight cool.
 					if horcollision(v, t, h, g, j, i, dt) then
 						hadhorcollision = true
@@ -160,7 +160,7 @@ function checkcollision(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table 
 			end
 		end
 	end
-	
+
 	return hadhorcollision, hadvercollision
 end
 
@@ -187,14 +187,14 @@ function passivecollision(v, t, h, g, j, i, dt)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
 function horcollision(v, t, h, g, j, i, dt)
 	if v.speedx < 0 then
 		--move object RIGHT (because it was moving left)
-		
+
 		if collisionexists("right", t) then
 			if callcollision("right", t, j, v, g, i) ~= false then
 				if t.speedx and t.speedx > 0 then
@@ -223,7 +223,7 @@ function horcollision(v, t, h, g, j, i, dt)
 		end
 	else
 		--move object LEFT (because it was moving right)
-		
+
 		if collisionexists("left", t) then
 			if callcollision("left", t, j, v, g, i) ~= false then
 				if t.speedx and t.speedx < 0 then
@@ -235,7 +235,7 @@ function horcollision(v, t, h, g, j, i, dt)
 				t.speedx = 0
 			end
 		end
-		
+
 		if collisionexists("right", v) then
 			if callcollision("right", v, h, t, i, g) ~= false then
 				if v.speedx > 0 then
@@ -252,7 +252,7 @@ function horcollision(v, t, h, g, j, i, dt)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -270,7 +270,7 @@ function vercollision(v, t, h, g, j, i, dt)
 				t.speedy = 0
 			end
 		end
-		
+
 		if collisionexists("ceil", v) then
 			if callcollision("ceil", v, h, t, i, g) ~= false then
 				if v.speedy < 0 then
@@ -286,14 +286,14 @@ function vercollision(v, t, h, g, j, i, dt)
 			v.y = t.y  + t.height
 			return true
 		end
-	else					
+	else
 		if collisionexists("ceil", t) then
 			if callcollision("ceil", t, j, v, g, i) ~= false then
 				if t.speedy and t.speedy < 0 then
 					t.speedy = 0
 				end
 			end
-		else	
+		else
 			if t.speedy and t.speedy < 0 then
 				t.speedy = 0
 			end
@@ -319,7 +319,7 @@ end
 
 function collisionscalls(dir, obj, a, b, c, d)
 	local r
-	
+
 	if obj.gravitydirection > math.pi/4*1 and obj.gravitydirection <= math.pi/4*3 then
 		if dir == "floor" then
 			if obj.floorcollide then
@@ -393,7 +393,7 @@ function collisionscalls(dir, obj, a, b, c, d)
 			end
 		end
 	end
-	
+
 	return r
 end
 
@@ -409,15 +409,15 @@ function callcollision(dir, obj, a, b, c, d)
 			return obj:rightcollide(a, b, c, d)
 		end
 	end
-	
+
 	obj.speedx, obj.speedy = converttostandard(obj, obj.speedx, obj.speedy)
-	
+
 	local r
-	
+
 	r = collisionscalls(dir, obj, a, b, c, d)
-	
+
 	obj.speedx, obj.speedy = convertfromstandard(obj, obj.speedx, obj.speedy)
-	
+
 	return r
 end
 
@@ -515,9 +515,9 @@ end
 
 function checkrect(x, y, width, height, list, statics)
 	local out = {}
-	
+
 	local inobj
-	
+
 	if type(list) == "table" and list[1] == "exclude" then
 		inobj = list[2]
 		list = "all"
@@ -525,15 +525,15 @@ function checkrect(x, y, width, height, list, statics)
 
 	for i, v in pairs(objects) do
 		local contains = false
-		
-		if list and list ~= "all" then			
+
+		if list and list ~= "all" then
 			for j = 1, #list do
 				if list[j] == i then
 					contains = true
 				end
 			end
 		end
-		
+
 		if list == "all" or contains then
 			for j, w in pairs(v) do
 				if statics or w.static ~= true or list ~= "all" then
@@ -559,7 +559,7 @@ function checkrect(x, y, width, height, list, statics)
 			end
 		end
 	end
-	
+
 	return out
 end
 
@@ -567,16 +567,16 @@ function converttostandard(obj, speedx, speedy)
 	--Convert speedx and speedy to horizontal values
 	local speed = math.sqrt(speedx^2+speedy^2)
 	local speeddir = math.atan2(speedy, speedx)
-	
+
 	local speedx, speedy = math.cos(speeddir-obj.gravitydirection+math.pi/2)*speed, math.sin(speeddir-obj.gravitydirection+math.pi/2)*speed
-				
+
 	if math.abs(speedy) < 0.00001 then
 		speedy = 0
 	end
 	if math.abs(speedx) < 0.00001 then
 		speedx = 0
 	end
-	
+
 	return speedx, speedy
 end
 
@@ -584,29 +584,29 @@ function convertfromstandard(obj, speedx, speedy)
 	--reconvert speedx and speedy to actual directions
 	local speed = math.sqrt(speedx^2+speedy^2)
 	local speeddir = math.atan2(speedy, speedx)
-	
+
 	local speedx, speedy = math.cos(speeddir+obj.gravitydirection-math.pi/2)*speed, math.sin(speeddir+obj.gravitydirection-math.pi/2)*speed
-	
+
 	if math.abs(speedy) < 0.00001 then
 		speedy = 0
 	end
 	if math.abs(speedx) < 0.00001 then
 		speedx = 0
 	end
-	
+
 	return speedx, speedy
 end
 
 function unrotate(rotation, gravitydirection, dt)
 	--rotate back to gravitydirection (portals)
 	rotation = math.mod(rotation, math.pi*2)
-	
+
 	if rotation < -math.pi then
 		rotation = rotation + math.pi*2
 	elseif rotation > math.pi then
 		rotation = rotation - math.pi*2
 	end
-	
+
 	if rotation == math.pi and gravitydirection == 0 then
 		rotation = rotation + portalrotationalignmentspeed*dt
 	elseif rotation <= -math.pi/2 and gravitydirection == math.pi*1.5 then
@@ -622,6 +622,6 @@ function unrotate(rotation, gravitydirection, dt)
 			rotation = (gravitydirection-math.pi/2)
 		end
 	end
-	
+
 	return rotation
 end

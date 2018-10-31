@@ -3,7 +3,7 @@ function love.conf(t)
 	t.author = "Maurice"
 	t.identity = "order_of_twilight"
 	t.console = false
-	t.screen.vsync = true
-	t.screen.width = 960
-	t.screen.height = 480
+	t.window.vsync = true
+	t.window.width = 960
+	t.window.height = 480
 end

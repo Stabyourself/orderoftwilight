@@ -7,12 +7,12 @@ function laser:init(x, y, dir)
 	self.active = true
 	self.static = false
 	self.gravity = 0
-	
+
 	self.speedy = 0
 	self.speedx = 0
 	self.width = 1/4
 	self.height = 1/4
-	
+
 	if self.dir == "right" then
 		self.speedx = laserspeed
 		self.width = 1
@@ -30,11 +30,11 @@ function laser:init(x, y, dir)
 		self.height = 1
 		self.y = self.y - 3/8
 	end
-	
-	
+
+
 	self.mask = {true, false, true, true}
 	self.colortimer = 0
-	self.colortable = {{255, 0, 0}, {255, 255, 255}, {255, 255, 0}}
+	self.colortable = {{1, 0, 0}, {1, 1, 1}, {1, 1, 0}}
 	self.lasercolor = 1
 	playsound(lasersound)
 end
@@ -46,7 +46,7 @@ function laser:update(dt)
 	if self.y > yscroll+height*2 or self.y < yscroll-height then
 		self.kill = true
 	end
-	
+
 	self.colortimer = self.colortimer + dt
 	while self.colortimer > lasercolordelay do
 		self.colortimer = self.colortimer - lasercolordelay
@@ -55,14 +55,14 @@ function laser:update(dt)
 			self.lasercolor = 1
 		end
 	end
-	
+
 	return self.kill
 end
 
 function laser:draw()
 	love.graphics.setColor(self.colortable[self.lasercolor])
 	love.graphics.rectangle("fill", math.floor(((self.x-xscroll)*tilewidth)*scale), math.floor(((self.y-yscroll)*tilewidth)*scale), self.width*tilewidth*scale, self.height*tilewidth*scale)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 end
 
 function laser:globalcollide(a, b, c, d, dir)

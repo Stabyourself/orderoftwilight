@@ -1,33 +1,33 @@
 function game_load()
-	love.graphics.setBackgroundColor(45, 192, 255)
-	
+	love.graphics.setBackgroundColor(0.18, 0.75, 1)
+
 	xscroll = 0
 	yscroll = 0
-	
+
 	if challengemenu then
 		startlevel(currentchallenge)
 	else
 		startlevel(1)
 	end
-	
+
 	gamewintimer = -1
 	gamewon = false
 end
 
 function game_update(dt)
 	spellbook_update(dt)
-	
-	
+
+
 	local xstart = math.max(math.floor(xscroll), 1)
-	
+
 	if spellbookopen then
 		return
 	end
-	
+
 	for i, v in pairs(objects) do
 		if i ~= "tile" and (not timefrozen or i == "player") then
 			local delete = {}
-			
+
 			for j, k in pairs(v) do
 				if k.update then
 					if k:update(dt) then
@@ -35,47 +35,47 @@ function game_update(dt)
 					end
 				end
 			end
-			
+
 			table.sort(delete, function(a,b) return a>b end)
-			
+
 			for j, k in pairs(delete) do
 				table.remove(v, k)
 			end
 		end
 	end
-	
+
 	if timefreezetimer > 0 then
 		timefreezetimer = timefreezetimer - dt
 		if timefreezetimer <= 0 then
 			timefrozen = false
 		end
 	end
-	
+
 	--DAMAGENUMBERS
 	local delete = {}
-	
+
 	for i, v in pairs(damagenumbers) do
 		if v:update(dt) then
 			table.insert(delete,i)
 		end
 	end
-	
+
 	table.sort(delete, function(a,b) return a>b end)
-	
+
 	for j, k in pairs(delete) do
 		table.remove(damagenumbers, k)
 	end
-	
+
 	---------------------
-	
+
 	physicsupdate(dt)
-	
+
 	for i = 1, runecount do
 		if runeanimationtimer[i] > 0 then
 			runeanimationtimer[i] = math.max(0, runeanimationtimer[i] - dt*10)
 		end
 	end
-	
+
 	if #currentspell > 0 then
 		spelltimeouttimer = spelltimeouttimer + dt
 		if spelltimeouttimer > spelltimeout then
@@ -83,30 +83,30 @@ function game_update(dt)
 			currentspell = {}
 		end
 	end
-	
+
 	if objects.player[1].x > xscroll - scrollborderright+width then
 		xscroll = objects.player[1].x+scrollborderright-width
 	elseif objects.player[1].x < xscroll + scrollborderleft then
 		xscroll = objects.player[1].x-scrollborderleft
 	end
-	
+
 	xscroll = math.max(0, math.min(mapwidth-width, xscroll))
-	
+
 	if math.floor(xscroll)+1 ~= spritebatchx then
 		generatespritebatch()
 	end
-	
+
 	if texts[currentlevel] and #texts[currentlevel] > textprogress then
 		if objects.player[1].x > texts[currentlevel][textprogress+1].x then
 			textprogress = textprogress + 1
 			texttimer = 0
 		end
 	end
-	
+
 	if texttimer < 1 then
 		texttimer = math.min(1, texttimer+dt)
 	end
-	
+
 	if deathtimer < deathtime then
 		if deathtimer == 0 then
 			--playsound(noisesound)
@@ -131,15 +131,15 @@ function game_update(dt)
 	else
 		noise = math.max(0, noise - dt*200)
 	end
-	
+
 	if lastspelltimer < lastspelltime then
 		lastspelltimer = math.min(lastspelltime, lastspelltimer+dt)
 	end
-	
+
 	if newrunetimer > 0 then
 		newrunetimer = math.max(0, newrunetimer-dt)
 	end
-	
+
 	if gamewintimer > -1 then
 		gamewintimer = gamewintimer - dt
 		if gamewintimer <= -1 then
@@ -157,33 +157,32 @@ function game_draw()
 			love.graphics.draw(_G["background" .. i .. "noiseimg"], math.floor(((x-1)*240)*scale) - math.floor(math.mod(xscroll, 240)*scale), 0, 0, scale, scale)
 		end
 	end
-	
-	drawworld()
-	
-	myStencil = love.graphics.newStencil(drawworld)
 
-	love.graphics.setStencil(myStencil)
-	
+	drawworld()
+
+	love.graphics.stencil(drawworld, "replace", 1)
+	love.graphics.setStencilTest("greater", 0)
+
 	for i = 1, levelnoise do
 		love.graphics.draw(noiseimg, math.floor(-xscroll*tilewidth*scale), 0, 0, scale, scale)
 	end
-	
-	love.graphics.setStencil()
-	
+
+	love.graphics.setStencilTest()
+
 	if not challengemenu then
 		for i = 1, textprogress do
 			if i == textprogress then
-				love.graphics.setColor(255, 255, 255, 255*texttimer)
+				love.graphics.setColor(1, 1, 1, texttimer)
 			end
 			properprint(texts[currentlevel][i].text, ((texts[currentlevel][i].cox-xscroll)*tilewidth), (texts[currentlevel][i].coy*tilewidth), true)
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 		end
 	end
-	
+
 	for i = 1, #customimages do
 		love.graphics.draw(_G["image" .. customimages[i].i .. "img"], math.floor((customimages[i].x-xscroll)*tilewidth*scale), math.floor((customimages[i].y-yscroll)*tilewidth*scale), 0, scale, scale)
 	end
-	
+
 	for i, v in pairs(objects) do
 		if i ~= "tile" then
 			for j, k in pairs(v) do
@@ -196,102 +195,102 @@ function game_draw()
 	for i, v in pairs(damagenumbers) do
 		v:draw()
 	end
-	
+
 	for i = 1, runecount do
 		local graphic = arrow.back
-		
+
 		love.graphics.draw(graphic, ((width*tilewidth)/2 - (runecount-1)/2*(runesize+runespacing) + (i-1)*(runesize+runespacing))*scale, 110*scale, 0, scale+scale*runeanimationtimer[i], scale+scale*runeanimationtimer[i], runesize/2, runesize/2)
-	
+
 		if currentspell[i] then
 			graphic = arrow[currentspell[i] ]
-		
+
 			if runeanimationtimer[i] > 0 then
-				love.graphics.setColor(205, 133, 208, 255*(1-runeanimationtimer[i]))
+				love.graphics.setColor(0.8, 0.52, 0.82, (1-runeanimationtimer[i]))
 				love.graphics.draw(arrow.glow, ((width*tilewidth)/2 - (runecount-1)/2*(runesize+runespacing) + (i-1)*(runesize+runespacing))*scale, 110*scale, 0, scale+scale*runeanimationtimer[i], scale+scale*runeanimationtimer[i], 15, 15)
-				love.graphics.setColor(255, 255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 			end
-			
+
 			if spelltimeouttimer > spelltimeout - .5 then
 				local a = (spelltimeout - spelltimeouttimer)/.5
-				love.graphics.setColor(255, 255, 255, 255*a)
+				love.graphics.setColor(1, 1, 1, a)
 			end
-			
+
 			love.graphics.draw(graphic, ((width*tilewidth)/2 - (runecount-1)/2*(runesize+runespacing) + (i-1)*(runesize+runespacing))*scale, 110*scale, 0, scale+scale*runeanimationtimer[i], scale+scale*runeanimationtimer[i], runesize/2, runesize/2)
-		
-			love.graphics.setColor(255, 255, 255, 255)
+
+			love.graphics.setColor(1, 1, 1)
 		end
-		
+
 		if i == runecount and newrunetimer > 0 then
-			love.graphics.setColor(255, 255, 255, 255*(newrunetimer/newrunetime))
+			love.graphics.setColor(1, 1, 1, newrunetimer/newrunetime)
 			love.graphics.draw(arrow.glow, ((width*tilewidth)/2 - (runecount-1)/2*(runesize+runespacing) + (i-1)*(runesize+runespacing))*scale, 110*scale, 0, scale*(newrunetimer/newrunetime)+.5, scale*(newrunetimer/newrunetime)+.5, 15, 15)
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 		end
 	end
-	
+
 	if lastspelltimer < lastspelltime then
 		for i = 1, #lastspell do
 			graphic = arrow[lastspell[i] ]
-			love.graphics.setColor(255, 255, 255, 255*(1-lastspelltimer/lastspelltime))
+			love.graphics.setColor(1, 1, 1, 1-lastspelltimer/lastspelltime)
 			love.graphics.draw(graphic, ((width*tilewidth)/2 - (runecount-1)/2*(runesize+runespacing) + (i-1)*(runesize+runespacing))*scale, 110*scale, 0, scale+scale*(lastspelltimer/lastspelltime)*1, scale+scale*(lastspelltimer/lastspelltime)*1, runesize/2, runesize/2)
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 		end
 	end
-	
+
 	if timefreezetimer > 0 then
-		love.graphics.setColor(153, 217, 234, 255*(timefreezetimer/timefreezetime))
+		love.graphics.setColor(0.6, 0.85, 0.92, timefreezetimer/timefreezetime)
 		love.graphics.draw(screengradientimg, 0, 0, 0, scale, scale)
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 	end
-	
+
 	spellbook_draw()
-	
+
 	if physicsdebug then
-		love.graphics.setColor(255, 0, 0)
+		love.graphics.setColor(1, 0, 0)
 		for i, v in pairs(objects) do
 			for j, k in pairs(v) do
 				love.graphics.rectangle("line", math.floor((k.x-xscroll)*tilewidth*scale)-.5, math.floor((k.y-yscroll)*tilewidth*scale)-.5, k.width*tilewidth*scale, k.height*tilewidth*scale)
 			end
 		end
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 	end
-	
-	
-	love.graphics.setColor(0, 255, 0)
+
+
+	love.graphics.setColor(0, 1, 0)
 	for i = 1, #debugshapes do
 		love.graphics.rectangle("line", math.floor((debugshapes[i][1]-xscroll)*tilewidth*scale)-.5, math.floor((debugshapes[i][2]-yscroll)*tilewidth*scale)-.5, debugshapes[i][3]*tilewidth*scale, debugshapes[i][4]*tilewidth*scale)
 	end
-	love.graphics.setColor(255, 255, 255)
-	
+	love.graphics.setColor(1, 1, 1)
+
 	if gamewintimer > -1 then
-		love.graphics.setColor(255, 255, 255, math.min(255, 255*(1-gamewintimer/gamewintime)))
+		love.graphics.setColor(1, 1, 1, math.min(1, 1-gamewintimer/gamewintime))
 		love.graphics.rectangle("fill", 0, 0, width*tilewidth*scale, height*tilewidth*scale)
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 	end
-	
+
 	if objects.player[1].ascendtimer > 0.1 then
 		local a = math.min(1, (1-(objects.player[1].ascendtimer-0.1)/ascendtime))
-		love.graphics.setColor(255, 255, 255, 255*a)
+		love.graphics.setColor(1, 1, 1, a)
 		love.graphics.rectangle("fill", 0, 0, 240*scale, 120*scale)
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 	end
 end
 
 function generatespritebatch()
 	worldspritebatch:clear()
-	
+
 	local xstart = math.floor(xscroll)+1
 	spritebatchx = xstart
-	
+
 	for x = 1, math.min(mapwidth+1-xstart, width+1) do
 		for y = 1, mapheight do
 			local tile = map[xstart+x-1][y][1]
 			if tile ~= 1 then
-				worldspritebatch:addq(tilequads[tile].quad, (x-1)*tilewidth, (y-1)*tilewidth)
+				worldspritebatch:add(tilequads[tile].quad, (x-1)*tilewidth, (y-1)*tilewidth)
 			end
 		end
 	end
 end
-	
+
 function drawworld()
 	love.graphics.draw(worldspritebatch, math.floor(-math.mod(xscroll, 1)*tilewidth*scale), 0, 0, scale, scale)
 end
@@ -303,9 +302,9 @@ function startlevel(s)
 	levelnoise = 1
 	backgroundnoise = 0
 	backgrounddarken = 0
-	
+
 	worldspritebatch = love.graphics.newSpriteBatch( tilequads[1].img, 1100 )
-	
+
 	lastspelltimer = lastspelltime
 	spellbooktimer = 0
 	timefreezetimer = 0
@@ -322,35 +321,35 @@ function startlevel(s)
 	objects.failbox = {}
 	objects.shockwave = {}
 	objects.page = {}
-	
+
 	levelrunecount = {3, 3, 4, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6}
 	runecount = levelrunecount[currentlevel]
-	
+
 	if allrunes then
 		runecount = 8
 	end
-	
+
 	customimages = {}
-	
+
 	damagenumbers = {}
-	
+
 	newrunetimer = 0
 	deathtimer = deathtime
 	startx = 4
 	starty = 4
 	noise = 100
-	
+
 	mapload(s)
-	
+
 	objects.player = {player:new(startx, starty)}
-	
+
 	skipupdate = true
 	currentspell = {}
 	runeanimationtimer = {}
 	for i = 1, maxrunecount do
 		runeanimationtimer[i] = 0
 	end
-	
+
 	spelltimeouttimer = 0
 	textprogress = 0
 	generatespritebatch()
@@ -360,12 +359,17 @@ function mapload(s)
 	mapimgdata = love.image.newImageData("maps/" .. s .. ".png")
 	mapwidth = mapimgdata:getWidth()
 	mapheight = mapimgdata:getHeight()
-	
+
 	roughmap = {}
 	for x = 1, mapwidth do
 		roughmap[x] = {}
 		for y = 1, mapheight do
 			local r, g, b = mapimgdata:getPixel(x-1, y-1)
+
+			r = math.floor(r * 255+0.5)
+			g = math.floor(g * 255+0.5)
+			b = math.floor(b * 255+0.5)
+
 			if r == 0 and g == 0 and b == 0 then
 				roughmap[x][y] = 0 --black
 			elseif r == 255 and g == 255 and b == 255 then
@@ -374,7 +378,7 @@ function mapload(s)
 				roughmap[x][y] = 2 --spike
 			elseif r<100 and r == g and g == b then
 				local count = 0
-				
+
 				if (mapimgdata:getPixel(x-2, y-1) == 0) then
 					count = count + 1
 				end
@@ -387,7 +391,7 @@ function mapload(s)
 				if (mapimgdata:getPixel(x-1, y) == 0) then
 					count = count + 1
 				end
-				
+
 				if count >= 3 then
 					roughmap[x][y] = 0
 				else
@@ -395,10 +399,10 @@ function mapload(s)
 				end
 				table.insert(customimages, {x=x-1, y=y-1, i=r})
 			else
-				local tileno = gettile(mapimgdata:getPixel(x-1, y-1))
-				
+				local tileno = gettile(r, g, b, a)
+
 				tileno = (tonumber(string.sub(tileno, 2)) or tileno)
-				
+
 				if tileno == "start" then
 					startx = x
 					starty = y
@@ -417,12 +421,12 @@ function mapload(s)
 						table.insert(objects.page, page:new(x-1, y-1, true))
 					end
 				end
-				
+
 				roughmap[x][y] = 1 --white
 			end
 		end
 	end
-	
+
 	map = {}
 	for x = 1, mapwidth do
 		map[x] = {}
@@ -433,39 +437,39 @@ function mapload(s)
 				for i = 1, 8 do --set all directions to false
 					directions[i] = false
 				end
-				
+
 				if x == 1 or y == 1 or roughmap[x-1][y-1] == 0 then
 					directions[1] = true
 				end
-				
+
 				if y == 1 or roughmap[x][y-1] == 0 then
 					directions[2] = true
 				end
-				
+
 				if x == mapwidth or y == 1 or roughmap[x+1][y-1] == 0 then
 					directions[3] = true
 				end
-				
+
 				if x == mapwidth or roughmap[x+1][y] == 0 then
 					directions[4] = true
 				end
-				
+
 				if x == mapwidth or y == mapheight or roughmap[x+1][y+1] == 0 then
 					directions[5] = true
 				end
-				
+
 				if y == mapheight or roughmap[x][y+1] == 0 then
 					directions[6] = true
 				end
-				
+
 				if x == 1 or y == mapheight or roughmap[x-1][y+1] == 0 then
 					directions[7] = true
 				end
-			
+
 				if x == 1 or roughmap[x-1][y] == 0 then
 					directions[8] = true
 				end
-				
+
 				for i = 2, 48 do
 					notfitting = false
 					for j = 1, 8 do
@@ -480,11 +484,11 @@ function mapload(s)
 						map[x][y] = {i}
 					end
 				end
-				
+
 				if map[x][y][1] == nil then
 					print("error lol (Don't know what tile to pick): "..x.." "..y)
 				end
-				
+
 				if tilequads[map[x][y][1]].collision then
 					table.insert(objects.tile, tile:new(x, y))
 				end
@@ -504,16 +508,16 @@ function mapload(s)
 				else
 					map[x][y] = {49}
 				end
-				
+
 				table.insert(objects.tile, tile:new(x, y))
-				
+
 			else
 				map[x][y] = {roughmap[x][y]}
 			end
 		end
 	end
-	
-		
+
+
 end
 
 function levelwin()
@@ -540,7 +544,7 @@ function gettile(r, g, b, a)
 			return i
 		end
 	end
-	
+
 	return 1
 end
 
@@ -577,7 +581,7 @@ function castspell()
 					pass = false
 				end
 			end
-			
+
 			if pass then
 				loadstring("objects.player[1]:" .. i .. "()")()
 				lastspell = {unpack(currentspell)}
@@ -596,7 +600,7 @@ function castspell()
 			end
 		end
 	end
-	
+
 	if #currentspell == runecount then
 		cancelspell()
 	end
@@ -621,13 +625,13 @@ function killeverything()
 		v:hurt(9999)
 		damageinworld(v.x+v.width/2, v.y, 9999)
 	end
-	
+
 	for i, v in pairs(objects.woodblock) do
 		v:hurt(9999)
 		damageinworld(v.x+v.width/2, v.y, 9999)
 	end
-	
-	
+
+
 	for i, v in pairs(objects.stomper) do
 		v.kill = true
 	end
@@ -638,23 +642,23 @@ function game_keypressed(key, unicode)
 		spellbook_keypressed(key, unicode)
 		return
 	end
-	
+
 	if key == "q" then
 		openspellbook()
 	end
-	
+
 	if key == "e" or key == "r" then
 		cancelspell()
 	end
-	
-	if key == " " then
+
+	if key == "space" then
 		objects.player[1]:jump()
 	end
-	
+
 	if key == "escape" and challengemenu then
 		changegamestate("menu")
 	end
-	
+
 	if not objects.player[1].dead and objects.player[1].ascendtimer == 0 and (key == "up" or key == "right" or key == "down" or key == "left") then
 		if #currentspell < runecount then
 			playsound(arrowsound)
@@ -667,7 +671,7 @@ function game_keypressed(key, unicode)
 end
 
 function game_keyreleased(key, unicode)
-	if key == " " then
+	if key == "space" then
 		objects.player[1]:stopjump()
 	end
 end
