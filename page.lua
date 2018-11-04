@@ -2,7 +2,7 @@ page = class:new()
 
 function page:init(x, y, t)
 	self.letter = t
-	
+
 	if self.letter then
 		self.width = 3
 		self.height = 2
@@ -14,15 +14,15 @@ function page:init(x, y, t)
 	self.y = y+.5-self.height/2
 	self.static = true
 	self.active = true
-	
+
 	self.timer = 0
-	
+
 	self.mask = {true, true, false, true, true, true, true, true, true, true, true, true, true}
 end
 
 function page:update(dt)
-	self.timer = math.mod(self.timer+dt*4, math.pi*2)
-	
+	self.timer = math.fmod(self.timer+dt*4, math.pi*2)
+
 	return self.kill
 end
 

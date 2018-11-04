@@ -64,7 +64,7 @@ function menu_draw()
 	for i = backgrounds-1, 1, -1  do
 		local xscroll = xscroll / i * 4
 		for x = 1, 2 do
-			love.graphics.draw(_G["background" .. i .. "noiseimg"], math.floor(((x-1)*240)*scale) - math.floor(math.mod(xscroll, 240)*scale), (backgrounds-i)*10*scale, 0, scale, scale)
+			love.graphics.draw(_G["background" .. i .. "noiseimg"], math.floor(((x-1)*240)*scale) - math.floor(math.fmod(xscroll, 240)*scale), (backgrounds-i)*10*scale, 0, scale, scale)
 		end
 	end
 

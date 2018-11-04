@@ -599,7 +599,7 @@ end
 
 function unrotate(rotation, gravitydirection, dt)
 	--rotate back to gravitydirection (portals)
-	rotation = math.mod(rotation, math.pi*2)
+	rotation = math.fmod(rotation, math.pi*2)
 
 	if rotation < -math.pi then
 		rotation = rotation + math.pi*2

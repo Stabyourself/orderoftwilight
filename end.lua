@@ -37,8 +37,8 @@ function end_update(dt)
 		ponyspeedy[i] = ponyspeedy[i] - dt*300
 	end
 
-	backflipi = math.mod(backflipi+dt, math.pi*1.5)
-	xscroll = math.mod(xscroll - dt*20, 240)
+	backflipi = math.fmod(backflipi+dt, math.pi*1.5)
+	xscroll = math.fmod(xscroll - dt*20, 240)
 
 	fadein = math.max(0, fadein-dt)
 end

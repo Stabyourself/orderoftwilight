@@ -154,7 +154,7 @@ function game_draw()
 	for i = backgrounds, 1, -1  do
 		local xscroll = xscroll / i * 4
 		for x = 1, math.ceil(width*tilewidth/240)+1 do
-			love.graphics.draw(_G["background" .. i .. "noiseimg"], math.floor(((x-1)*240)*scale) - math.floor(math.mod(xscroll, 240)*scale), 0, 0, scale, scale)
+			love.graphics.draw(_G["background" .. i .. "noiseimg"], math.floor(((x-1)*240)*scale) - math.floor(math.fmod(xscroll, 240)*scale), 0, 0, scale, scale)
 		end
 	end
 
@@ -292,7 +292,7 @@ function generatespritebatch()
 end
 
 function drawworld()
-	love.graphics.draw(worldspritebatch, math.floor(-math.mod(xscroll, 1)*tilewidth*scale), 0, 0, scale, scale)
+	love.graphics.draw(worldspritebatch, math.floor(-math.fmod(xscroll, 1)*tilewidth*scale), 0, 0, scale, scale)
 end
 
 function startlevel(s)

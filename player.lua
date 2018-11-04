@@ -37,7 +37,7 @@ end
 function player:update(dt)
 	self:movement(dt)
 
-	self.hornglowtimer = math.mod(self.hornglowtimer+dt*5, 1)
+	self.hornglowtimer = math.fmod(self.hornglowtimer+dt*5, 1)
 
 	self.walkframetimer = self.walkframetimer + dt*10
 	while self.walkframetimer > playerwalkdelay do
