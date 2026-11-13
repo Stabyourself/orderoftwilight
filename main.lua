@@ -29,7 +29,7 @@ function love.load()
 	require "page"
 	require "intro"
 
-	gamefinished = true
+	gamefinished = false
 
 	physicsdebug = false
 	debugshapes = {}
