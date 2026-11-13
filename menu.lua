@@ -5,6 +5,9 @@ function menu_load()
 	love.graphics.setBackgroundColor(0.18, 0.75, 1)
 	xscroll = 0
 	menuitems = {"start game", "all runes game", "challenges", "quit"}
+	if isweb then
+		table.remove(menuitems) --nothing to quit to in a browser
+	end
 	twilightframe = 1
 	twilighttimer = 0
 	noise = 0
@@ -194,9 +197,8 @@ function menu_keypressed(key)
 			challengemenu = true
 			targetoffset = 240
 			playsound(menuselectsound)
-		elseif menuselection == 4 then
+		elseif menuitems[menuselection] == "quit" then
 			love.event.quit()
-			playsound(menubacksound)
 		end
 	end
 end

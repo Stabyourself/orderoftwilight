@@ -1,4 +1,6 @@
 function love.load()
+	isweb = love.system.getOS() == "Web"
+
 	require "class"
 	require "variables"
 	require "essentials"
@@ -342,6 +344,12 @@ end
 function love.keypressed(key, unicode)
 	if _G[gamestate .. "_keypressed"] then
 		_G[gamestate .. "_keypressed"](key, unicode)
+	end
+end
+
+function love.mousepressed(x, y, button)
+	if _G[gamestate .. "_mousepressed"] then
+		_G[gamestate .. "_mousepressed"](x, y, button)
 	end
 end
 
