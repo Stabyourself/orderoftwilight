@@ -1,4 +1,4 @@
 # orderoftwilight
-Runs on LÖVE 11.2
+Runs on LÖVE 11.5
 
 MIT license

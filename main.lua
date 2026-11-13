@@ -29,8 +29,6 @@ function love.load()
 
 	gamefinished = true
 
-	love.filesystem.setIdentity( "order_of_twilight" )
-
 	physicsdebug = false
 	debugshapes = {}
 
@@ -145,9 +143,8 @@ function love.load()
 	tilewidth = 6
 	scale = 4
 	if love.window.getMode() ~= width*tilewidth*scale then
-		love.window.setMode(width*tilewidth*scale, height*tilewidth*scale, false, false, 0)
+		love.window.setMode(width*tilewidth*scale, height*tilewidth*scale, {vsync = 1})
 	end
-	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 
 	runesize = 14
 	runespacing = 2
