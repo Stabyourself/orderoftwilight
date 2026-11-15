@@ -341,9 +341,9 @@ function playsound(s)
 	love.audio.play(s)
 end
 
-function love.keypressed(key, unicode)
+function love.keypressed(key, scancode)
 	if _G[gamestate .. "_keypressed"] then
-		_G[gamestate .. "_keypressed"](key, unicode)
+		_G[gamestate .. "_keypressed"](scancode)
 	end
 end
 
@@ -353,8 +353,8 @@ function love.mousepressed(x, y, button)
 	end
 end
 
-function love.keyreleased(key, unicode)
+function love.keyreleased(key, scancode)
 	if _G[gamestate .. "_keyreleased"] then
-		_G[gamestate .. "_keyreleased"](key, unicode)
+		_G[gamestate .. "_keyreleased"](scancode)
 	end
 end

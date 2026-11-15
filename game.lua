@@ -550,25 +550,25 @@ end
 
 function leftkey()
 	if objects.player[1].gravitydirection > math.pi/4*1 and objects.player[1].gravitydirection <= math.pi/4*3 then
-		return love.keyboard.isDown("a")
+		return love.keyboard.isScancodeDown("a")
 	elseif objects.player[1].gravitydirection > math.pi/4*3 and objects.player[1].gravitydirection <= math.pi/4*5 then
-		return love.keyboard.isDown("w")
+		return love.keyboard.isScancodeDown("w")
 	elseif objects.player[1].gravitydirection > math.pi/4*5 and objects.player[1].gravitydirection <= math.pi/4*7 then
-		return love.keyboard.isDown("d")
+		return love.keyboard.isScancodeDown("d")
 	else
-		return love.keyboard.isDown("s")
+		return love.keyboard.isScancodeDown("s")
 	end
 end
 
 function rightkey()
 	if objects.player[1].gravitydirection > math.pi/4*1 and objects.player[1].gravitydirection <= math.pi/4*3 then
-		return love.keyboard.isDown("d")
+		return love.keyboard.isScancodeDown("d")
 	elseif objects.player[1].gravitydirection > math.pi/4*3 and objects.player[1].gravitydirection <= math.pi/4*5 then
-		return love.keyboard.isDown("s")
+		return love.keyboard.isScancodeDown("s")
 	elseif objects.player[1].gravitydirection > math.pi/4*5 and objects.player[1].gravitydirection <= math.pi/4*7 then
-		return love.keyboard.isDown("a")
+		return love.keyboard.isScancodeDown("a")
 	else
-		return love.keyboard.isDown("w")
+		return love.keyboard.isScancodeDown("w")
 	end
 end
 
