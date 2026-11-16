@@ -134,6 +134,12 @@ function menu_draw()
 end
 
 function menu_keypressed(key)
+	if key == "space" then
+		key = "return"
+	elseif key == "e" then
+		key = "escape"
+	end
+
 	if challengemenu then
 		if key == "up" then
 			currentchallenge = currentchallenge - 4
