@@ -138,6 +138,14 @@ function menu_keypressed(key)
 		key = "return"
 	elseif key == "e" then
 		key = "escape"
+	elseif key == "w" then
+		key = "up"
+	elseif key == "s" then
+		key = "down"
+	elseif key == "a" then
+		key = "left"
+	elseif key == "d" then
+		key = "right"
 	end
 
 	if challengemenu then
@@ -180,10 +188,10 @@ function menu_keypressed(key)
 
 		return
 	else
-		if (key == "up" or key == "w") and menuselection > 1 then
+		if key == "up" and menuselection > 1 then
 			menuselection = menuselection - 1
 			playsound(menumovesound)
-		elseif (key == "down" or key == "s") and menuselection < #menuitems then
+		elseif key == "down" and menuselection < #menuitems then
 			menuselection = menuselection + 1
 			playsound(menumovesound)
 		end
