@@ -92,17 +92,17 @@ function spellbook_draw()
 end
 
 function spellbook_keypressed(key, unicode)
-	if key == "q" or key == "escape" then
+	if key == "q" or key == "e" or key == "escape" then
 		closespellbook()
 	end
 
-	if key == "right" then
+	if key == "right" or key == "d" then
 		if spellbookpage*4 < #spellnames then
 			spellbookpage = spellbookpage + 1
 		end
 	end
 
-	if key == "left" then
+	if key == "left" or key == "a" then
 		if spellbookpage > 1 then
 			spellbookpage = spellbookpage - 1
 		end
