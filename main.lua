@@ -144,6 +144,9 @@ function love.load()
 
 	tilewidth = 6
 	scale = 4
+	if isweb then
+		scale = webscale()
+	end
 	if love.window.getMode() ~= width*tilewidth*scale then
 		love.window.setMode(width*tilewidth*scale, height*tilewidth*scale, {vsync = 1})
 	end
@@ -232,6 +235,9 @@ function love.update(dt)
 	--love.graphics.setCaption("FPS: " .. love.timer.getFPS())
 
 	dt = math.min(dt, 1/30)
+	if isweb then
+		updatewebscale(dt)
+	end
 	if skipupdate then
 		skipupdate = false
 		return
@@ -241,6 +247,33 @@ function love.update(dt)
 		_G[gamestate .. "_update"](dt)
 	end
 	noiserepeatsound:setVolume(math.max(storynoise/2, noise)/100*0.6)
+end
+
+--web: biggest whole scale that fits the browser window, the page stretches the rest
+function webscale()
+	local size = love.js and love.js.eval and
+		love.js.eval("Math.floor(innerWidth*devicePixelRatio)+' '+Math.floor(innerHeight*devicePixelRatio)")
+	local w, h = string.match(size or "", "(%d+) (%d+)")
+	if not w then
+		return scale
+	end
+	return math.max(1, math.min(math.floor(tonumber(w)/(width*tilewidth)), math.floor(tonumber(h)/(height*tilewidth))))
+end
+
+local webscaletimer = 0
+function updatewebscale(dt)
+	webscaletimer = webscaletimer + dt
+	if webscaletimer < 0.5 then
+		return
+	end
+	webscaletimer = 0
+	local s = webscale()
+	if s ~= scale then
+		scale = s
+		love.window.setMode(width*tilewidth*scale, height*tilewidth*scale, {vsync = 1})
+		screenwidth = 240*scale
+		screenheight = 120*scale
+	end
 end
 
 function love.draw()
