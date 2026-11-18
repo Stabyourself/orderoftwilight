@@ -123,10 +123,6 @@ function love.load()
 
 	logo = love.graphics.newImage("graphics/logo.png")
 	logoblood = love.graphics.newImage("graphics/logoblood.png")
-	if isweb then
-		logo:setFilter("linear", "linear")
-		logoblood:setFilter("linear", "linear")
-	end
 	stabsound = love.audio.newSource("sounds/stab.ogg", "static")
 
 	backgrounds = 4
